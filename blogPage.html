@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+    <head>
+         <link rel="stylesheet" href="blogPage.css">
+         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    </head>
+    
+    <body>
+        
+        <br><br>
+        <div id="blog_area">
+            
+            <!-- blog area-->
+            
+            <button id='go' class='w3-button w3-green' onclick="window.location.href='view.html';">BACK</button>
+        </div>
+        
+        <br><br>
+        <div id="comment_area">
+            <h3>Comments: </h3>
+            <div class='w3-container' id='comment_form'>
+                <div id='comments'>
+                    <!--user comments appear here-->
+                </div>
+                <br>
+                <br>
+                
+                <div id='new_comment'>
+                    <label>Tell author your thoughts: </label>
+                    <input class="w3-input" id = 'comment_to_submit' type="text" required>
+                    <button id='submit_comment' class='w3-round w3-grey'>SUBMIT</button>
+                    
+                    <br>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    </body>
+    
+    
+    
+    <script>
+        
+        window.onload = main;
+        
+        $('#submit_comment').click(function(){
+           submitComment(); 
+        });
+        
+        function main(){
+            getBlog();
+            getComments();
+        }
+        
+        function getCookie(cname) {
+			var name = cname + "=";
+			var ca = document.cookie.split(';');
+			for(var i = 0; i < ca.length; i++) {
+			  var c = ca[i];
+			  while (c.charAt(0) == ' ') {
+				c = c.substring(1);
+			  }
+			  if (c.indexOf(name) === 0) {
+				return c.substring(name.length, c.length);
+			  }
+			}
+			return "";
+		}
+        
+        function submitComment(){
+            var commentBody = $('#comment_to_submit').val();
+            $.ajax({
+				url: 'http://localhost:8080/cms/users/blog/' + getCookie('blog_id'),
+				type: 'POST',
+				datatype: 'JSON',
+                data: JSON.stringify({ 
+					"commentBody" : commentBody
+				}),
+				headers: {
+				  "accept": "application/json",
+				  "Content-Type":"application/json",
+				  "Access-Control-Allow-Origin":"*"
+				},
+				success: function(data, status, xhr) {
+				// Do something with the result
+                    
+                    alert("You have successfully submitted a comment!");
+                    getComments();
+                    
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					  alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText + "\n" + "Invalid username and password!");
+				}
+			});
+        }
+        
+        function getComments(){
+            $.ajax({
+				url: 'http://localhost:8080/cms/users/blog/' + getCookie('blog_id') + '/comments',
+				type: 'GET',
+				datatype: 'JSON',
+				headers: {
+				  "accept": "application/json",
+				  "Content-Type":"application/json",
+				  "Access-Control-Allow-Origin":"*"
+				},
+				success: function(data, status, xhr) {
+				// Do something with the result
+                    
+                    for(let i = 0; i < data.length; i++){
+                        
+                        let commentBody = data[i].commentBody;
+                        $('#comments').append('<strong>Anonymous viewer said: </strong><br>' + commentBody + '<br>');
+                    }
+                    
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					  alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText + "\n" + "Invalid username and password!");
+				}
+			});
+        }
+        
+        
+        function getBlog(){
+			$.ajax({
+				url: 'http://localhost:8080/cms/users/blog/' + getCookie('blog_id'),
+				type: 'GET',
+				datatype: 'JSON',
+				headers: {
+				  "accept": "application/json",
+				  "Content-Type":"application/json",
+				  "Access-Control-Allow-Origin":"*"
+				},
+				success: function(data, status, xhr) {
+				// Do something with the result
+                    
+                    var blogId = data.blogId;
+                    var blogName = data.blogName;
+					var author = data.author;
+					var date = data.date;
+					var leadImageUrl = data.leadImageUrl;
+					var blogBody = data.blogBody;
+                    
+					var blog = `
+                        
+                        <h1>${blogName}</h1>
+                        <h3>Author: ${author} Published date: ${date}</h3>
+                        <br>
+                        <img src=${leadImageUrl}>
+                        <br>
+                        <br>
+                        <strong>${blogBody}</strong>
+                        <input type='hidden' value='${blogId}'>
+                    `;
+                    
+                    $("#blog_area").append(blog);
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					  alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText + "\n" + "Invalid username and password!");
+				}
+			});
+		}
+        
+    </script>
+    
+
+</html>

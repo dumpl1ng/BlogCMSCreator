@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+    <head>
+         <link rel="stylesheet" href="index.css">
+         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    </head>
+    
+<body>
+    
+<div id=background onclick="restore();">
+	<video autoplay muted loop id="myVideo">
+  	<source src="index_background.mov" type="video/mp4">
+</video>
+
+</div>
+
+<div id=title>
+    <button id="button" onclick="expandOverlay();">Creator</button>
+	<button id="button" onclick="window.location.href='view.html';" >Viewer</button>
+</div>
+
+    
+    
+<script>
+	
+	
+    function expandOverlay(){
+        var overlay = document.createElement("div");
+        overlay.setAttribute("id","overlay");
+        overlay.setAttribute("class","overlay");
+        document.body.appendChild(overlay);
+        
+        
+        
+        var br = document.createElement("br");
+        var sign_in_form = document.createElement("div");
+        var user = document.createTextNode("User Name");
+        var user_name = document.createElement("input");
+        var pw = document.createTextNode("Password");
+        var pw_input = document.createElement("input");
+        var sign_in = document.createElement("button");
+        var register = document.createElement("button");
+        sign_in_form.setAttribute("id","sign_form");
+        sign_in_form.appendChild(user);
+        sign_in_form.appendChild(br);
+        sign_in_form.appendChild(user_name);
+        sign_in_form.appendChild(br);
+        sign_in_form.appendChild(pw);
+        sign_in_form.appendChild(pw_input);
+        sign_in_form.appendChild(br);
+        sign_in_form.appendChild(sign_in);
+        sign_in_form.appendChild(register);
+        user_name.setAttribute("class","w3-input w3-border w3-round");
+        user_name.setAttribute("id","user_input");
+        user_name.setAttribute("name","user");
+        pw_input.setAttribute("class","w3-input w3-border w3-round");
+        pw_input.setAttribute("id","pw_input");
+        pw_input.setAttribute("type","password");
+        pw_input.setAttribute("name","pw");
+		
+		sign_in.innerHTML = "Sign In";
+        sign_in.setAttribute("id", "go");
+        sign_in.setAttribute("name","login");
+        
+		register.innerHTML = "Register";
+        register.setAttribute("name","register");
+        register.setAttribute("id", "register");
+        
+		
+        overlay.appendChild(sign_in_form);
+    }
+    
+    function restore(){
+        document.body.removeChild(document.getElementById("overlay"));
+    }
+	
+	
+</script>
+
+<script>
+	$("body").delegate("#go", "click" ,function(){
+		$.ajax({
+			url: 'http://localhost:8080/cms/users/login',
+			type: 'POST',
+			data: JSON.stringify({ 
+				"email": $('#user_input').val(),
+				"password": $('#pw_input').val()
+			}),
+			datatype: 'JSON',
+			headers: {
+              "accept": "application/json",
+			  "Content-Type":"application/json",
+              "Access-Control-Allow-Origin":"*"
+            },
+			success: function(data, status, xhr) {
+			// Do something with the result
+				alert('You have successfully logged in!');
+				document.cookie='access_token=' + xhr.getResponseHeader('Authorization');
+				document.cookie='user_id=' + xhr.getResponseHeader('UserID');
+				window.location.href = 'create.html';
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+                  alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText + "\n" + "Invalid username and password!");
+            }
+		});
+
+	});
+	
+	$("body").delegate("#register", "click" ,function(){
+		$.ajax({
+			url: 'http://localhost:8080/cms/users',
+			type: 'POST',
+			data: JSON.stringify({ 
+				"email": $('#user_input').val(),
+				"password": $('#pw_input').val()
+			}),
+			datatype: 'JSON',
+			headers: {
+              "accept": "application/json",
+			  "Content-Type":"application/json",
+              "Access-Control-Allow-Origin":"*"
+            },
+			success: function(data, status, xhr) {
+			// Do something with the result
+				alert('You have successfully created an account!');
+				document.cookie='access_token=' + xhr.getResponseHeader('Authorization');
+				document.cookie='user_id=' + xhr.getResponseHeader('UserID');
+				
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+                  alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText + "\n" + "Invalid username and password!");
+            }
+		});
+
+	});
+	
+	
+	
+	
+</script>
+
+
+
+     
+</body>
+</html>

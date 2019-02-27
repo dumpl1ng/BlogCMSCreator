@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<title>Search Result</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="view.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+.w3-sidebar a {font-family: "Roboto", sans-serif}
+body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
+</style>
+<body class="w3-content" style="max-width:1200px">
+	
+	
+	
+	
+	
+	<!-- Sidebar/menu -->
+	<nav class="w3-sidebar w3-bar-block w3-grey w3-collapse w3-top" style="z-index:3;width:250px" id="mySidebar">
+	  <div class="w3-container w3-display-container w3-padding-16">
+	    <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
+	    <h3 class="w3-wide"><b>Blog Viewer</b></h3>
+		
+	  </div>
+	  <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
+	    <a onclick="myAccFunc()" href="javascript:void(0)" class="w3-button w3-block w3-white w3-left-align" id="myBtn">
+	      SORT BY <i class="fa fa-caret-down"></i>
+	    </a>
+	    <div id="demoAcc" class="w3-bar-block w3-hide w3-padding-large w3-medium">
+	      <button href="#" class="w3-bar-item w3-button w3-light-grey" >Author</button>
+	      <button href="#" class="w3-bar-item w3-button w3-light-grey" >Date</button>
+	    </div>
+	  </div>
+	</nav>
+
+	<!-- Top menu on small screens -->
+	<header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge">
+	  <div class="w3-bar-item w3-padding-24 w3-wide">Blog Viewer</div>
+	  <a class="w3-bar-item w3-button w3-padding-24 w3-right"><i class="fa fa-bars"></i></a>
+	</header>
+
+	<!-- Overlay effect when opening sidebar on small screens -->
+	<div class="w3-overlay w3-hide-large" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+	<!-- !PAGE CONTENT! -->
+	<div class="w3-main" style="margin-left:250px">
+
+	  <!-- Push down content on small screens -->
+	  <div class="w3-hide-large" style="margin-top:83px"></div>
+	  
+	  <!-- Top header -->
+	  <header class="w3-container w3-xlarge" >
+	    <p class="w3-right">
+			
+			<div class='w3-container w3-grey'>
+				<button id='home' class="w3-bar-item w3-button w3-right" onclick="location.href ='index.html';">Home</button>
+			</div>
+			
+			<div class="w3-row-padding w3-margin-bottom">
+				<div class="w3-quarter" id="blog_area">
+					<br><br>
+					
+					<!-- Blog Area-->
+					
+				</div>
+			</div><br>
+				
+	    </p>
+	  </header>
+
+
+
+
+	  
+	<script>
+		
+		window.onload = showBlogList;
+		
+		
+		
+		$("body").delegate(":button", "click" ,function() {
+			
+			if ($(this).attr('class') == 'w3-button w3-round'){
+				var blogId = $(this).parent().find('#blog_id').val();
+				document.cookie = 'blog_id=' + blogId;
+				window.location.href = "blogPage.html";
+			}
+			
+		});
+		
+		function myAccFunc() {
+		    var x = document.getElementById("demoAcc");
+		    if (x.className.indexOf("w3-show") == -1) {
+		        x.className += " w3-show";
+		    } else {
+		        x.className = x.className.replace(" w3-show", "");
+		    }
+		}
+		
+		
+		function showBlogList(){
+			$.ajax({
+				url: 'http://localhost:8080/cms/users/blog/all',
+				type: 'GET',
+				datatype: 'JSON',
+				headers: {
+				  "accept": "application/json",
+				  "Content-Type":"application/json",
+				  "Access-Control-Allow-Origin":"*"
+				},
+				success: function(data, status, xhr) {
+				// Do something with the result
+					for(let i = 0; i < data.length; i++ ){
+						var blogId = data[i].blogId;
+						var author = data[i].author;
+						var date = data[i].date;
+						var blogName = data[i].blogName;
+						var leadImageUrl = data[i].leadImageUrl;
+						var blogBody = data[i].blogBody;
+						
+						var blogBlock = `<div class='w3-container w3-green w3-padding-24' style='width: 900px; height: 160px; margin-bottom: 10px;'>
+						<div id='blog_title' >${blogName}</div>
+						<div id= 'info' style='font-size: small;'>author: ${author} published date: ${date}</div>
+						<div class='w3-right'><img  width=80px height=80px src='${leadImageUrl}'/></div>
+						<button class='w3-button w3-round'>&rarr;</button>
+						<input type='hidden' id='blog_id' value='${blogId}'>
+					</div>`
+					
+						$('#blog_area').append(blogBlock);
+					
+						
+					}
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					  alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText + "\n" + "Invalid username and password!");
+				}
+			});
+		}
+
+
+
+	</script>
+
+
+
+	    
+	  
+
+
+</body>
+</html>
